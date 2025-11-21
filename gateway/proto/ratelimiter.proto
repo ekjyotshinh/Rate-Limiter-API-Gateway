@@ -1,0 +1,23 @@
+syntax = "proto3";
+package ratelimiter;
+option go_package = "rate-limiter-api-gateway/proto;proto";
+
+// RateLimiter provides atomic decision checks for token-bucket limits.
+service RateLimiter {
+  rpc Check(CheckRequest) returns (CheckResponse) {}
+}
+
+message CheckRequest {
+  string key = 1;         // e.g. "user:123:endpoint:/v1/foo"
+  int64 now_ms = 2;       // current time in ms
+  int32 capacity = 3;     // bucket capacity
+  double refill_rate = 4; // tokens per second
+  int32 cost = 5;         // tokens consumed per request
+  int32 ttl_seconds = 6;  // how long to persist the bucket state
+}
+
+message CheckResponse {
+  bool allowed = 1;
+  double tokens_left = 2;
+  double capacity = 3;
+}
